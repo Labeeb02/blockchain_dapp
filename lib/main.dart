@@ -1,228 +1,471 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_multi_page_drawer/ui/navigation_drawer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-void main() => runApp(MultiPageDrawerApp());
+// function to trigger build when the app is run
+void main() {
+  runApp(MaterialApp(
+    initialRoute: '/',
+    routes: {
+      '/': (context) => const HomeRoute(),
+      '/second': (context) => const SecondRoute(),
+      '/third': (context) => const ThirdRoute(),
+    },
+  )); //MaterialApp
+}
 
-class MultiPageDrawerApp extends StatelessWidget {
+class HomeRoute extends StatelessWidget {
+  const HomeRoute({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter multi page drawer',
-      initialRoute: '/',
-      routes: {
-        // When we navigate to the "/" route, build the FirstScreen Widget
-        '/': (context) => FirstScreen(),
-        // When we navigate to the "/second" route, build the SecondScreen Widget
-        '/second': (context) => SecondScreen(),
-      },
-      builder: (context, child) {
-        return DynamicApp(
-          navigator: (child.key as GlobalKey<NavigatorState>),
-          child: child,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Owner Dapp'),
+        backgroundColor: Colors.green,
+      ), // AppBar
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              child: const Text('Send Details To RA'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/second');
+              },
+            ),
+            SizedBox(height: 16.0),// ElevatedButton
+            ElevatedButton(
+              child: const Text('Verify Public Key'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/third');
+              },
+            ), //
+            SizedBox(height: 16.0),// ElevatedButton
+            ElevatedButton(
+              child: const Text('Publish To BlockChain'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/third');
+              },
+            ), // ElevatedButton
+          ], // <Widget>[]
+        ), // Column
+      ), // Center
+    ); // Scaffold
+  }
+}
+
+
+
+class SecondRoute extends StatefulWidget {
+  const SecondRoute({Key? key}) : super(key: key);
+
+  @override
+  State<SecondRoute> createState() => _SecondRouteState();
+}
+
+class _SecondRouteState extends State<SecondRoute> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _dateOfBirthController = TextEditingController();
+
+
+  final _phoneNumberController = TextEditingController();
+  final _publicKeyController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _dateOfBirthController.dispose();
+    _phoneNumberController.dispose();
+    _publicKeyController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Form Input"),
+        backgroundColor: Colors.green,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return
+
+                      'Please enter your name.';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _dateOfBirthController,
+                decoration: InputDecoration(
+                  labelText: 'Date of Birth',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your date of birth.';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _phoneNumberController,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return
+
+                      'Please enter your phone number.';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _publicKeyController,
+                decoration: InputDecoration(
+                  labelText: 'Public Key',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your public key.';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    print(_nameController.text);
+                    print(_dateOfBirthController.text);
+                    print(_phoneNumberController.text);
+                    print(_publicKeyController.text);
+                    // final response = await http.post(
+                    //   Uri.parse('http://localhost:3000/info'),
+                    //   body: {
+                    //     'name': _nameController.text,
+                    //     'dateOfBirth': _dateOfBirthController.text,
+                    //     'phoneNumber': _phoneNumberController.text,
+                    //     'publicKey': _publicKeyController.text,
+                    //   },
+                    // );
+                    //
+                    // // Handle response
+                    // if (response.statusCode == 200) {
+                    //   // Show success message
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(content: Text('Data submitted successfully!')),
+                    //   );
+                    // } else {
+                    //   // Show error message
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(content: Text('Error: ${response.statusCode}')),
+                    //   );
+                    // }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.green,
+                  onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 3,
+                ),
+                child: Text(
+                  'Submit',
+                  style: TextStyle(fontSize: 18), // Text style
+                ),
+              ),
+
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.green,
+                  onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 3,
+                ),
+                child: const Text('Back'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ThirdRoute extends StatelessWidget {
+  const ThirdRoute({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Third Route"),
+        backgroundColor: Colors.blue,
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () async {
+            final response = await http.get(
+              Uri.parse('https://example.com/api/endpoint'),
+            );
+            // Handle the response
+            if (response.statusCode == 200) {
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('API call successful!')),
+              );
+            } else {
+              // Show error message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error: ${response.statusCode}')),
+              );
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            primary: Colors.blue,
+            onPrimary: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 3,
+          ),
+          child: Text(
+            'Call API',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+//
+// class ThirdRoute extends StatefulWidget {
+//   const ThirdRoute({Key? key}) : super(key: key);
+//   @override
+//   _ThirdRouteState createState() => _ThirdRouteState();
+// }
+//
+// class _ThirdRouteState extends State<ThirdRoute> {
+//
+// // class ThirdRoute extends StatelessWidget {
+//
+//
+//   late Future<List<String>> onStrings;
+//   late Future<List<String>> okStrings;
+//   late Future<List<String>> vnStrings;
+//   late Future<List<List<String>>> infoStrings;
+//   Future<List<String>> getListFromMap(Future<Map<String, List<String>>> futureData,String which) async {
+//     final Map<String, List<String>> dataMap = await futureData;
+//
+//     // Replace 'list1' with the key of the desired list
+//     List<String> list1 = dataMap[which] ?? [];
+//
+//     return list1;
+//   }
+//   Future<List<List<String>>> transformFuture(Future<Map<String, List<String>>> futureMap) {
+//     return futureMap.then((Map<String, List<String>> data) {
+//       // Extract all the lists from the map and convert them to Future<List<String>>
+//       List<Future<List<String>>> listFutures = data.values.map((list) async {
+//         return list;
+//       }).toList();
+//
+//       // Use Future.wait to wait for all list futures to complete
+//       return Future.wait(listFutures);
+//     });
+//   }
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     Future<Map<String,List<String>>> m = fetchData();
+//     onStrings = getListFromMap(m, 'onl');
+//     okStrings = getListFromMap(m, 'okl');
+//     vnStrings = getListFromMap(m, 'vnl');
+//     infoStrings = transformFuture(m);
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text("Requests"),
+//         backgroundColor: Colors.green,
+//       ),
+//       body: FutureBuilder<List<List<String>>>(
+//         future: infoStrings,//Future<List<String>>.value(['Item 1', 'Item 2', 'Item 3']),
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return CircularProgressIndicator();
+//           } else if (snapshot.hasError) {
+//             return Text('Error: ${snapshot.error}');
+//           } else {
+//             return StringListCardWidget(strings: snapshot.data ?? []);
+//           }
+//         },
+//       ),// AppBar
+//     ); // Scaffold
+//   }
+// }
+
+Future<Map<String,List<String>>> fetchData() async {
+
+  final response = await http.get(Uri.parse('http://localhost:3000/strings'));
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> jsonData = jsonDecode(response.body);
+    print(jsonData);
+    // Assuming the API response contains two lists: list1 and list2
+    List<String> list1 = (jsonData['ownerNameList'] as List).cast<String>();
+    List<String> list2 = (jsonData['ownerKeyList'] as List).cast<String>();
+    List<String> list3 = (jsonData['vehicleNoList'] as List).cast<String>();
+
+    // Create a map to store the lists
+    Map<String, List<String>> stringLists = {
+      'onl': list1,
+      'okl': list2,
+      'vnl':list3,
+    };
+
+    return stringLists;
+  } else {
+    throw Exception('Failed to load data from the API');
+  }
+}
+
+// Future<List<List<String>>> fetchData() async {
+//   final response = await http.get(Uri.parse('http://localhost:3000/strings'));
+//   if (response.statusCode == 200) {
+//     final List<dynamic> data = jsonDecode(response.body);
+//
+//     // Assuming the API response is a list of strings
+//     List<String> strings = data.cast<String>();
+//
+//     return strings;
+//   } else {
+//     throw Exception('Failed to load data from the API');
+//   }
+// }
+
+class StringListCardWidget extends StatefulWidget {
+  final List<List<String>> strings;
+
+  StringListCardWidget({required this.strings});
+
+  @override
+  _StringListCardWidgetState createState() => _StringListCardWidgetState();
+}
+
+class _StringListCardWidgetState extends State<StringListCardWidget> {
+  List<bool> isExpandedList=[];
+  List<String> ownerNameList=[];
+  List<String> ownerKeyList=[];
+  List<String> vehicleNoList=[];
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the isExpandedList with false for each card
+
+    ownerNameList = widget.strings[0];
+    ownerKeyList = widget.strings[1];
+    vehicleNoList = widget.strings[2];
+    isExpandedList = List.generate(ownerNameList.length, (index) => false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: ownerNameList.length,
+      itemBuilder: (context, index) {
+        return Card(
+          elevation: 4,
+          margin: EdgeInsets.all(8),
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(ownerNameList[index]),
+                trailing: IconButton(
+                  icon: Icon(
+                    isExpandedList[index]
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      isExpandedList[index] = !isExpandedList[index];
+                    });
+                  },
+                ),
+              ),
+              if (isExpandedList[index])
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    children: [
+                      Text(
+                      'Additional content for ${ownerNameList[index]}',
+                      style: TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        'Owner Public Key - ${ownerKeyList[index]}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        'Vehicle No - ${vehicleNoList[index]}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Add your validation logic here
+                          // This function will be called when the button is pressed
+                          // You can replace this with your own validation code.
+                          print("Validation Button Pressed");
+                        },
+                        child: Text('Validate'),
+                      )
+                    ]
+                  ),
+                ),
+            ],
+          ),
         );
       },
     );
-  }
-}
-
-class DynamicApp extends StatefulWidget {
-  final GlobalKey<NavigatorState> navigator;
-  final Widget child;
-  List<DrawerItem> drawerItems = [
-    DrawerItem("First Screen", Icons.first_page),
-    DrawerItem("Second Screen", Icons.dashboard),
-  ];
-
-  DynamicApp({Key key, this.navigator, this.child}) : super(key: key);
-
-  @override
-  _DynamicAppState createState() => _DynamicAppState();
-}
-
-class _DynamicAppState extends State<DynamicApp> {
-  var _selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: NavigationDrawer(
-        selectedIndex: _selectedIndex,
-        drawerItems: widget.drawerItems,
-        headerView: Container(
-          decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 32.0),
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    width: 120.0,
-                    height: 120.0,
-                    decoration: new BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white),
-                        image: new DecorationImage(
-                            fit: BoxFit.fill,
-                            image: new NetworkImage(
-                                "https://avatars3.githubusercontent.com/u/15701316?s=460&v=4"))),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        "Ali Mohammadi",
-                        style: TextStyle(fontSize: 22, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        onNavigationItemSelect: (index) {
-          widget.navigator.currentState.pushNamed("/second");
-          setState(() {
-            _selectedIndex = index;
-          });
-          return true; // true means that drawer must close and false is Vice versa
-        },
-      ),
-      body: widget.child,
-    );
-  }
-}
-
-class MyDrawer extends StatelessWidget {
-  final GlobalKey<NavigatorState> navigator;
-
-  const MyDrawer({Key key, this.navigator}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final state = RootDrawer.of(context);
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 32.0),
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: 120.0,
-                      height: 120.0,
-                      decoration: new BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white),
-                          image: new DecorationImage(
-                              fit: BoxFit.fill,
-                              image: new NetworkImage(
-                                  "https://avatars3.githubusercontent.com/u/15701316?s=460&v=4"))),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          "Ali Mohammadi",
-                          style: TextStyle(fontSize: 22, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.dashboard),
-            title: Text('First page'),
-            onTap: () {
-              navigator.currentState.pushReplacementNamed("/");
-              state.close();
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.send),
-            title: Text('Second page'),
-            onTap: () {
-              navigator.currentState.pushNamed("/second");
-              state.close();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class FirstScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("First screen"),
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            RootScaffold.openDrawer(context);
-          },
-        ),
-      ),
-      body: Center(
-        child: Text(
-          "First Screen",
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
-    );
-  }
-}
-
-class SecondScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Second Screen"),
-      ),
-      body: Center(
-        child: Text(
-          "Second Screen",
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
-    );
-  }
-}
-
-class RootDrawer {
-  static DrawerControllerState of(BuildContext context) {
-    final DrawerControllerState drawerControllerState =
-        context.rootAncestorStateOfType(TypeMatcher<DrawerControllerState>());
-    return drawerControllerState;
-  }
-}
-
-class RootScaffold {
-  static openDrawer(BuildContext context) {
-    final ScaffoldState scaffoldState =
-        context.rootAncestorStateOfType(TypeMatcher<ScaffoldState>());
-    scaffoldState.openDrawer();
-  }
-
-  static ScaffoldState of(BuildContext context) {
-    final ScaffoldState scaffoldState =
-        context.rootAncestorStateOfType(TypeMatcher<ScaffoldState>());
-    return scaffoldState;
   }
 }
